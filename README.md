@@ -22,7 +22,7 @@ This document includes:
 - **Database**: PostgreSQL with GORM ORM, using UUIDs for primary keys.
 - **Authentication**: JWT with role-based access control (Admin, Employee).
 - **Audit Logging**: Tracks create/update actions with user ID, IP address, and request ID.
-- **Module Path**: `github.com/yourusername/go-deals`.
+- **Module Path**: `https://github.com/erwin1412/dealls`.
 - **Structure**: Follows SOLID principles with separated handlers, services, repositories, and models.
 
 ### Models
@@ -78,7 +78,7 @@ export PORT="8084"
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/go-deals.git
+   git clone https://github.com/erwin1412/dealls.git
    cd go-deals
    ```
 2. Install dependencies:
@@ -489,8 +489,8 @@ Follow this sequence to test the full system:
 
 ## Conclusion
 
-This guide provides everything needed to use and extend the Payslip System API. By following the setup and testing instructions, developers can quickly integrate with the system. For further enhancements or issues, refer to the codebase at `github.com/yourusername/go-deals` or contact the development team.
+This guide provides everything needed to use and extend the Payslip System API. By following the setup and testing instructions, developers can quickly integrate with the system. For further enhancements or issues, refer to the codebase at `https://github.com/erwin1412/dealls` or contact the development team.
 
 **Version**: 1.0  
 **Date**: June 25, 2025  
-**Author**: [Your Name]
+**Author**: Erwin
