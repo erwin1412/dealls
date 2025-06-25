@@ -1,0 +1,774 @@
+openapi: 3.0.3
+info:
+  title: Payslip Generation System API
+  description: API for managing employee payroll, including attendance, overtime, reimbursements, and payslip generation.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [admin, employee]
+      required:
+        - token
+        - user_id
+        - role
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [admin, employee]
+      required:
+        - username
+        - password
+        - role
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        role:
+          type: string
+          enum: [admin, employee]
+      required:
+        - message
+        - user_id
+        - username
+        - role
+    AttendancePeriodRequest:
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+          example: "2025-06-01"
+        end_date:
+          type: string
+          format: date
+          example: "2025-06-30"
+      required:
+        - start_date
+        - end_date
+    AttendancePeriodResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        period_id:
+          type: string
+          format: uuid
+      required:
+        - message
+        - period_id
+    AttendanceRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2025-06-02"
+        period_id:
+          type: string
+          format: uuid
+      required:
+        - date
+        - period_id
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    OvertimeRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2025-06-02"
+        hours:
+          type: number
+          format: float
+          example: 2.5
+        period_id:
+          type: string
+          format: uuid
+      required:
+        - date
+        - hours
+        - period_id
+    ReimbursementRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+          example: 100.50
+        description:
+          type: string
+          example: "Travel expenses for client meeting"
+        period_id:
+          type: string
+          format: uuid
+      required:
+        - amount
+        - description
+        - period_id
+    Attendance:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        UserID:
+          type: string
+          format: uuid
+        Date:
+          type: string
+          format: date-time
+        PeriodID:
+          type: string
+          format: uuid
+        CreatedAt:
+          type: string
+          format: date-time
+        UpdatedAt:
+          type: string
+          format: date-time
+        CreatedBy:
+          type: string
+          format: uuid
+        UpdatedBy:
+          type: string
+          format: uuid
+        IPAddress:
+          type: string
+      required:
+        - ID
+        - UserID
+        - Date
+        - PeriodID
+        - CreatedAt
+        - UpdatedAt
+        - CreatedBy
+        - UpdatedBy
+        - IPAddress
+    Overtime:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        UserID:
+          type: string
+          format: uuid
+        Date:
+          type: string
+          format: date-time
+        Hours:
+          type: number
+          format: float
+        PeriodID:
+          type: string
+          format: uuid
+        CreatedAt:
+          type: string
+          format: date-time
+        UpdatedAt:
+          type: string
+          format: date-time
+        CreatedBy:
+          type: string
+          format: uuid
+        UpdatedBy:
+          type: string
+          format: uuid
+        IPAddress:
+          type: string
+      required:
+        - ID
+        - UserID
+        - Date
+        - Hours
+        - PeriodID
+        - CreatedAt
+        - UpdatedAt
+        - CreatedBy
+        - UpdatedBy
+        - IPAddress
+    Reimbursement:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        UserID:
+          type: string
+          format: uuid
+        Amount:
+          type: number
+          format: float
+        Description:
+          type: string
+        PeriodID:
+          type: string
+          format: uuid
+        CreatedAt:
+          type: string
+          format: date-time
+        UpdatedAt:
+          type: string
+          format: date-time
+        CreatedBy:
+          type: string
+          format: uuid
+        UpdatedBy:
+          type: string
+          format: uuid
+        IPAddress:
+          type: string
+      required:
+        - ID
+        - UserID
+        - Amount
+        - Description
+        - PeriodID
+        - CreatedAt
+        - UpdatedAt
+        - CreatedBy
+        - UpdatedBy
+        - IPAddress
+    AttendancePeriod:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        StartDate:
+          type: string
+          format: date-time
+        EndDate:
+          type: string
+          format: date-time
+        CreatedAt:
+          type: string
+          format: date-time
+        UpdatedAt:
+          type: string
+          format: date-time
+        CreatedBy:
+          type: string
+          format: uuid
+        UpdatedBy:
+          type: string
+          format: uuid
+      required:
+        - ID
+        - StartDate
+        - EndDate
+        - CreatedAt
+        - UpdatedAt
+        - CreatedBy
+        - UpdatedBy
+    PayslipResponse:
+      type: object
+      properties:
+        period:
+          $ref: '#/components/schemas/AttendancePeriod'
+        attendance:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attendance'
+        overtime:
+          type: array
+          items:
+            $ref: '#/components/schemas/Overtime'
+        reimbursements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reimbursement'
+        base_salary:
+          type: number
+          format: float
+        overtime_pay:
+          type: number
+          format: float
+        reimbursement_amount:
+          type: number
+          format: float
+        total_pay:
+          type: number
+          format: float
+      required:
+        - period
+        - attendance
+        - overtime
+        - reimbursements
+        - base_salary
+        - overtime_pay
+        - reimbursement_amount
+        - total_pay
+    PayrollSummaryItem:
+      type: object
+      properties:
+        username:
+          type: string
+        total_pay:
+          type: number
+          format: float
+      required:
+        - username
+        - total_pay
+    PayrollSummaryResponse:
+      type: object
+      properties:
+        summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayrollSummaryItem'
+        total_payroll:
+          type: number
+          format: float
+      required:
+        - summary
+        - total_payroll
+paths:
+  /login:
+    post:
+      summary: Authenticate a user
+      description: Authenticate a user and return a JWT token for subsequent requests.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /register:
+    post:
+      summary: Register a new user
+      description: Create a new user (admin or employee). Requires admin authentication.
+      operationId: register
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Invalid input or username already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-admin user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /attendance-period:
+    post:
+      summary: Create an attendance period
+      description: Define a new payroll period with start and end dates. Requires admin authentication.
+      operationId: createAttendancePeriod
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttendancePeriodRequest'
+      responses:
+        '200':
+          description: Period created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendancePeriodResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-admin user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /attendance:
+    post:
+      summary: Submit attendance
+      description: Record attendance for a specific date and period. Requires employee authentication.
+      operationId: submitAttendance
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttendanceRequest'
+      responses:
+        '200':
+          description: Attendance submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid input or attendance already submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-employee user) or payroll processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /overtime:
+    post:
+      summary: Submit overtime
+      description: Record overtime hours for a specific date and period. Requires employee authentication.
+      operationId: submitOvertime
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OvertimeRequest'
+      responses:
+        '200':
+          description: Overtime submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid input or overtime exceeds limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-employee user) or payroll processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /reimbursement:
+    post:
+      summary: Submit reimbursement
+      description: Submit a reimbursement request with amount and description. Requires employee authentication.
+      operationId: submitReimbursement
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReimbursementRequest'
+      responses:
+        '200':
+          description: Reimbursement submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-employee user) or payroll processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /payroll/{period_id}:
+    post:
+      summary: Run payroll
+      description: Process payroll for all employees in a specific period. Requires admin authentication.
+      operationId: runPayroll
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Payroll processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid period ID or payroll already processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-admin user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Period not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /payslip/{period_id}:
+    get:
+      summary: Generate payslip
+      description: Retrieve a payslip for the authenticated employee for a specific period.
+      operationId: generatePayslip
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Payslip retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayslipResponse'
+        '400':
+          description: Invalid period ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-employee user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Payroll not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /payroll-summary/{period_id}:
+    get:
+      summary: Generate payroll summary
+      description: Retrieve a summary of all payslips for a specific period. Requires admin authentication.
+      operationId: generatePayrollSummary
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Payroll summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayrollSummaryResponse'
+        '400':
+          description: Invalid period ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Unauthorized (non-admin user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
