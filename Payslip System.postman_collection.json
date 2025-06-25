@@ -1,0 +1,324 @@
+{
+	"info": {
+		"_postman_id": "5a1548f0-0199-4c95-9e8f-4638f2284034",
+		"name": "Payslip System",
+		"description": "Postman collection for testing the Payslip Generation System API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16873236"
+	},
+	"item": [
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "Generate Payroll Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_admin}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/payroll-summary/{{period_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payroll-summary",
+								"{{period_id}}"
+							]
+						},
+						"description": "Generate a summary of all payslips for a period (admin-only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Attendance Period",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_admin}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"start_date\": \"2025-06-01\",\n  \"end_date\": \"2025-06-30\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendance-period",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendance-period"
+							]
+						},
+						"description": "Create a new attendance period for payroll (admin-only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Run Payroll",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_admin}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payroll/{{period_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payroll",
+								"{{period_id}}"
+							]
+						},
+						"description": "Process payroll for a specific period (admin-only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_admin}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"newemployee123\",\n  \"password\": \"securepass123z\",\n  \"role\": \"employee\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"register"
+							]
+						},
+						"description": "Register a new user (admin-only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "Submit Attendance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-06-02\",\n  \"period_id\": \"{{period_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendance",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendance"
+							]
+						},
+						"description": "Submit attendance for a specific date and period (employee-only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Reimbursement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100.50,\n  \"description\": \"Travel expenses for client meeting\",\n  \"period_id\": \"{{period_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reimbursement",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reimbursement"
+							]
+						},
+						"description": "Submit a reimbursement request (employee-only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Overtime",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2025-06-02\",\n  \"hours\": 2.5,\n  \"period_id\": \"{{period_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/overtime",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"overtime"
+							]
+						},
+						"description": "Submit overtime hours for a specific date and period (employee-only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Payslip",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/payslip/{{period_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payslip",
+								"{{period_id}}"
+							]
+						},
+						"description": "Generate a payslip for the authenticated employee (employee-only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				},
+				"description": "Authenticate a user and obtain a JWT token."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8084"
+		},
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTA5MjMyMzksInJvbGUiOiJlbXBsb3llZSIsInVzZXJfaWQiOiJjNGM3YjkxZS00ZTFjLTQyYWUtYTFlMC05ZjQ3NzQ2OTJmYjEifQ.hQqKzbaNWMlH6TX21W9oguH6jkCkthrI7_2kVl6YZ28"
+		},
+		{
+			"key": "period_id",
+			"value": "800e173a-e256-4344-80aa-c6ea39879557"
+		},
+		{
+			"key": "token_admin",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTA5MjU3NzQsInJvbGUiOiJhZG1pbiIsInVzZXJfaWQiOiIxOTJjZTRhYi05OTkyLTRhMzMtYjRkNC05ZjcyMzI0ODRhYzUifQ.ueawODbiELxmjq1FwGCmkaQ5ZyI1GUCiclitkzkn0gk",
+			"type": "string"
+		}
+	]
+}
